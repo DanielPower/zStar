@@ -30,24 +30,19 @@ function zStar.getPath(startX, startY, finishX, finishY)
             break
         end
         -- Find the node with the lowest F cost
-        local lowestCost = nil
+        local lowestCost = {fCost=1/0}
         for x in pairs(zStar.openNodes) do
             for y in pairs(zStar.openNodes[x]) do
-                if not lowestCost then
+                if zStar.openNodes[x][y].fCost < lowestCost.fCost then
                     lowestCost = zStar.openNodes[x][y]
-                else
-                    if zStar.openNodes[x][y].fCost < lowestCost.fCost then
-                        lowestCost = zStar.openNodes[x][y]
-                    end
                 end
             end
         end
 
         -- Close the node with the lowest F cost, and open its surrounding nodes
-        node = zStar.openNodes[lowestCost.x][lowestCost.y]
-        array.set(zStar.closedNodes, node.x, node.y, node)
-        array.set(zStar.openNodes, node.x, node.y, nil)
-        zStar._openAdjacent(node)
+        array.set(zStar.closedNodes, lowestCost.x, lowestCost.y, lowestCost)
+        array.set(zStar.openNodes, lowestCost.x, lowestCost.y, nil)
+        zStar._openAdjacent(lowestCost)
     end
 
     -- Create and return the path
@@ -85,13 +80,15 @@ end
 
 function zStar._openAdjacent(parent)
     -- Open surrounding nodes
-    zStar._openNode(parent, parent.x-1, parent.y-1, 1.4142)
-    zStar._openNode(parent, parent.x, parent.y-1, 1)
-    zStar._openNode(parent, parent.x+1, parent.y-1, 1.4142)
     zStar._openNode(parent, parent.x-1, parent.y, 1)
     zStar._openNode(parent, parent.x+1, parent.y, 1)
-    zStar._openNode(parent, parent.x-1, parent.y+1, 1.4142)
+    zStar._openNode(parent, parent.x, parent.y-1, 1)
     zStar._openNode(parent, parent.x, parent.y+1, 1)
+
+    -- Diagonals. Comment out these lines to use 4-directional movement.
+    zStar._openNode(parent, parent.x-1, parent.y-1, 1.4142)
+    zStar._openNode(parent, parent.x+1, parent.y-1, 1.4142)
+    zStar._openNode(parent, parent.x-1, parent.y+1, 1.4142)
     zStar._openNode(parent, parent.x+1, parent.y+1, 1.4142)
 end
 
@@ -107,7 +104,7 @@ function zStar._openNode(parent, x, y, g)
         zStar.finalNode = node
     end
 
-    -- Check the the node is occupied by a collidable in Bump
+    -- Check if the node is occupied by a collidable in Bump
     if array.check(zStar.collidables, x, y) == nil then
         local node = {}
         node.parent = parent
@@ -148,3 +145,4 @@ end
 
 _zStar = zStar
 return(zStar)
+
