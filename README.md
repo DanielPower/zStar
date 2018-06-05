@@ -1,4 +1,4 @@
-# zStar
+# zStar ( This is old and I doubt it's efficient )
 Lua pathfinding library using the astar algorithm.
 
 ## Dependencies
